@@ -2,27 +2,37 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import StoreFilters from "./StoreFilters";
+import StoreSort from "./StoreSort"; 
+
+
 
 const AllStores = ({ className }) => {
   const [stores, setStores] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [totalStores, setTotalStores] = useState(0); // Track total stores count
+
 
   // React Router hook to manage URL query parameters
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const fetchStores = async (filters) => {
+  const fetchStores = async (filters, sortField = "", sortOrder = "asc") => {
     setIsLoading(true);
 
-    const queryParams = Object.entries(filters)
+    let queryParams = Object.entries(filters)
       .filter(([_, value]) => value) // Ignore empty values
       .map(([key, value]) => `${key}=${value}`)
       .join("&");
+
+      if (sortField) {
+        queryParams += `&_sort=${sortField}&_order=${sortOrder}`;
+      }
 
     const url = `http://localhost:3001/stores?${queryParams}`;
 
     try {
       const response = await axios.get(url);
       setStores(response.data);
+      setTotalStores(response.data.length);
     } catch (error) {
       console.error("Error fetching stores:", error);
     } finally {
@@ -49,6 +59,14 @@ const AllStores = ({ className }) => {
     setSearchParams({});
   };
 
+
+
+  const handleApplySort = (sortField, sortOrder) => {
+    const currentFilters = getFiltersFromParams();
+    fetchStores(currentFilters, sortField, sortOrder);
+  };
+  
+
   useEffect(() => {
     // Fetch stores based on URL filters
     const initialFilters = getFiltersFromParams();
@@ -61,9 +79,19 @@ const AllStores = ({ className }) => {
         onApplyFilters={(filters) => handleApplyFilters(filters)}
         onClearFilters={handleClearFilters}
       />
+       <StoreSort onApplySort={handleApplySort} /> 
       {isLoading ? (
         <p className="text-center">Loading stores...</p>
       ) : (
+        <>
+       <div className="mb-6 flex justify-center items-center p-4 bg-gray-100 rounded-lg shadow-md max-w-xs mx-auto">
+  <p className="text-lg font-medium text-gray-800">
+    Total Stores:{" "}
+    <span className="text-2xl font-semibold text-blue-600">{totalStores}</span>
+  </p>
+</div>
+
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {stores.map((store) => (
             <div
@@ -89,8 +117,10 @@ const AllStores = ({ className }) => {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
+    
   );
 };
 

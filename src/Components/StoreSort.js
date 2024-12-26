@@ -34,7 +34,7 @@ const StoreSort = ({ onApplySort }) => {
             onChange={handleSortChange}
             className="w-full border rounded px-3 py-2"
           >
-            <option value="">Select Sort Option</option>
+            <option value="">Select Sort </option>
             <option value="name">Name</option>
           </select>
         </div>
@@ -50,7 +50,7 @@ const StoreSort = ({ onApplySort }) => {
             onChange={handleSortChange}
             className="w-full border rounded px-3 py-2"
           >
-            <option value="">Select Sort Option</option>
+            <option value="">Select Sort </option>
             <option value="is_featured">Featured</option>
           </select>
         </div>
@@ -66,7 +66,7 @@ const StoreSort = ({ onApplySort }) => {
             onChange={handleSortChange}
             className="w-full border rounded px-3 py-2"
           >
-            <option value="">Select Sort Option</option>
+            <option value="">Select Sort </option>
             <option value="clicks">Popularity (Clicks)</option>
           </select>
         </div>
@@ -82,7 +82,7 @@ const StoreSort = ({ onApplySort }) => {
             onChange={handleSortChange}
             className="w-full border rounded px-3 py-2"
           >
-            <option value="">Select Sort Option</option>
+            <option value="">Select Sort </option>
             <option value="cashback_amount">Cashback Amount</option>
           </select>
         </div>

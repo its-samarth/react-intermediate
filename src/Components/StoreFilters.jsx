@@ -5,7 +5,7 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
     cats: "",
     cashback_enabled: "",
     is_promoted: "",
-    is_sharable: "",
+    is_shareable: "",
     status: "",
     alphabet: "",
   });
@@ -24,6 +24,11 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
       delete updatedFilters.alphabet;  // Remove alphabet to prevent it from being sent in the final filter object
     }
 
+     // Ensure is_shareable is correctly passed (only if it's set, otherwise it's omitted)
+  if (updatedFilters.is_shareable === "") {
+    delete updatedFilters.is_shareable;  // Remove filter if no value selected (empty string)
+  }
+
     onApplyFilters(updatedFilters);
   };
 
@@ -33,7 +38,7 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
       cats: "",
       cashback_enabled: "",
       is_promoted: "",
-      is_sharable: "",
+      is_shareable: "",
       status: "",
       alphabet: "",
     });
@@ -63,6 +68,7 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
             onChange={handleChange}
             className="w-full border rounded px-3 py-2"
             placeholder="Category ID"
+            min="1"
           />
         </div>
 
@@ -104,13 +110,13 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
 
         {/* Sharable Filter */}
         <div>
-          <label htmlFor="is_sharable" className="block text-sm font-medium mb-1">
+          <label htmlFor="is_shareable" className="block text-sm font-medium mb-1">
             Sharable
           </label>
           <select
-            id="is_sharable"
-            name="is_sharable"
-            value={filters.is_sharable}
+            id="is_shareable"
+            name="is_shareable"
+            value={filters.is_shareable}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2"
           >

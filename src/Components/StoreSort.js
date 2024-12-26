@@ -2,7 +2,15 @@ import React, { useState } from "react";
 
 const StoreSort = ({ onApplySort }) => {
   const [sortOption, setSortOption] = useState("");
-  const [order, setOrder] = useState("asc");
+  const [order, setOrder] = useState("");
+
+  const sortOptions = [
+    { value: "", label: "Select Sort Option" },
+    { value: "name", label: "Name" },
+    { value: "is_featured", label: "Featured Status" },
+    { value: "clicks", label: "Popularity (Clicks)" },
+    { value: "cashback_amount", label: "Cashback Amount" }
+  ];
 
   const handleSortChange = (e) => {
     const { value } = e.target;
@@ -23,67 +31,22 @@ const StoreSort = ({ onApplySort }) => {
       <h2 className="text-xl font-semibold mb-4">Sort Stores</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Sort by Name */}
+        {/* Combined Sort Options */}
         <div>
-          <label htmlFor="sortName" className="block text-sm font-medium mb-1">
-            Sort by Name
+          <label htmlFor="sortOption" className="block text-sm font-medium mb-1">
+            Sort By
           </label>
           <select
-            id="sortName"
+            id="sortOption"
             value={sortOption}
             onChange={handleSortChange}
             className="w-full border rounded px-3 py-2"
           >
-            <option value="">Select Sort </option>
-            <option value="name">Name</option>
-          </select>
-        </div>
-
-        {/* Sort by Featured */}
-        <div>
-          <label htmlFor="sortFeatured" className="block text-sm font-medium mb-1">
-            Sort by Featured Status
-          </label>
-          <select
-            id="sortFeatured"
-            value={sortOption}
-            onChange={handleSortChange}
-            className="w-full border rounded px-3 py-2"
-          >
-            <option value="">Select Sort </option>
-            <option value="is_featured">Featured</option>
-          </select>
-        </div>
-
-        {/* Sort by Popularity */}
-        <div>
-          <label htmlFor="sortPopularity" className="block text-sm font-medium mb-1">
-            Sort by Popularity
-          </label>
-          <select
-            id="sortPopularity"
-            value={sortOption}
-            onChange={handleSortChange}
-            className="w-full border rounded px-3 py-2"
-          >
-            <option value="">Select Sort </option>
-            <option value="clicks">Popularity (Clicks)</option>
-          </select>
-        </div>
-
-        {/* Sort by Cashback */}
-        <div>
-          <label htmlFor="sortCashback" className="block text-sm font-medium mb-1">
-            Sort by Cashback
-          </label>
-          <select
-            id="sortCashback"
-            value={sortOption}
-            onChange={handleSortChange}
-            className="w-full border rounded px-3 py-2"
-          >
-            <option value="">Select Sort </option>
-            <option value="cashback_amount">Cashback Amount</option>
+            {sortOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -97,12 +60,20 @@ const StoreSort = ({ onApplySort }) => {
             value={order}
             onChange={handleOrderChange}
             className="w-full border rounded px-3 py-2"
+            disabled={!sortOption} // Disable if no sort option selected
           >
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
         </div>
       </div>
+
+      {/*  Show current sort status */}
+      {sortOption && (
+        <div className="mt-4 text-sm text-gray-600">
+          Sorting by: {sortOptions.find(opt => opt.value === sortOption)?.label} ({order === "asc" ? "ascending" : "descending"})
+        </div>
+      )}
     </div>
   );
 };

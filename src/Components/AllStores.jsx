@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { button,useState, useEffect } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import StoreFilters from "./StoreFilters";
@@ -6,6 +6,7 @@ import StoreSort from "./StoreSort";
 import SearchIcon from "@mui/icons-material/Search";
 import { debounce } from "lodash";
 import BeatLoader from "react-spinners/BeatLoader";
+import { Heart } from "lucide-react";
 
 const AllStores = ({ className }) => {
   const [stores, setStores] = useState([]);
@@ -17,6 +18,7 @@ const AllStores = ({ className }) => {
   const [limit] = useState(18);
   const [hasMore, setHasMore] = useState(true);
   const [currentSort, setCurrentSort] = useState({ field: "", order: "" });
+  const [favoriteStores, setFavoriteStores] = useState(new Set());
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -97,6 +99,31 @@ const AllStores = ({ className }) => {
     }
   }, [page]);
 
+  const toggleFavorite = (storeId) => {
+    setFavoriteStores(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(storeId)) {
+        newFavorites.delete(storeId);
+      } else {
+        newFavorites.add(storeId);
+      }
+      return newFavorites;
+    });
+  };
+
+  // Load favorite stores from localStorage on component mount
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('favoriteStores');
+    if (savedFavorites) {
+      setFavoriteStores(new Set(JSON.parse(savedFavorites)));
+    }
+  }, []);
+
+  // Save favorites to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('favoriteStores', JSON.stringify(Array.from(favoriteStores)));
+  }, [favoriteStores]);
+
   const handleInfiniteScroll = debounce(() => {
     if (
       window.innerHeight + document.documentElement.scrollTop + 20 >=
@@ -147,7 +174,7 @@ const AllStores = ({ className }) => {
   return (
     <div className={`my-[50px] px-4 ${className}`}>
       <div className="flex mb-6">
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 ">
           <StoreFilters
             onApplyFilters={handleApplyFilters}
             onClearFilters={handleClearFilters}
@@ -185,8 +212,24 @@ const AllStores = ({ className }) => {
           {filteredStores.map((store) => (
             <div
               key={store.id}
-              className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-200 ease-in-out"
+              className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-200 ease-in-out relative"
             >
+
+              
+            {/* Add Heart icon for favoriting */}
+            <button
+              onClick={() => toggleFavorite(store.id)}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <Heart
+                className={`w-6 h-6 transition-colors ${
+                  favoriteStores.has(store.id)
+                    ? 'text-red-500 fill-red-500'
+                    : 'text-gray-400'
+                }`}
+              />
+            </button>
+
               <img
                 src={store.logo}
                 alt={store.name}

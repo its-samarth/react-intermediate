@@ -1,5 +1,32 @@
 import React, { useState } from "react";
 
+// Separate CashbackDisplay component
+const CashbackDisplay = ({ 
+  cashback_enabled, 
+  rate_type, 
+  amount_type, 
+  cashback_amount 
+}) => {
+  if (!cashback_enabled || cashback_enabled === "0") {
+    return <span className="text-gray-500">No cashback available</span>;
+  }
+
+  const formatAmount = () => {
+    const formattedAmount = Number(cashback_amount).toFixed(2);
+    return amount_type === "fixed" ? `$${formattedAmount}` : `${formattedAmount}%`;
+  };
+
+  return (
+    <div className="flex items-center space-x-1">
+      <span className="text-green-600">
+        {rate_type === "upto" ? "Up to " : ""}
+        {formatAmount()}
+        {" cashback"}
+      </span>
+    </div>
+  );
+};
+
 const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
   const [filters, setFilters] = useState({
     cats: "",
@@ -8,6 +35,9 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
     is_shareable: "",
     status: "",
     alphabet: "",
+    rate_type: "",        // Added for cashback
+    amount_type: "",   // Added for cashback
+    cashback_amount: ""   // Added for cashback
   });
 
   const handleChange = (e) => {
@@ -18,21 +48,18 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
   const handleApplyFilters = () => {
     let updatedFilters = { ...filters };
 
-    // If alphabet is set, update the filter to match stores starting with that letter.
     if (updatedFilters.alphabet) {
-      updatedFilters.name_like = `^${updatedFilters.alphabet.toLowerCase()}`; // Convert alphabet to lowercase and add regex for starting letter
-      delete updatedFilters.alphabet; // Remove alphabet to prevent it from being sent in the final filter object
+      updatedFilters.name_like = `^${updatedFilters.alphabet.toLowerCase()}`;
+      delete updatedFilters.alphabet;
     }
 
-    // Ensure is_shareable is correctly passed (only if it's set, otherwise it's omitted)
     if (updatedFilters.is_shareable === "") {
-      delete updatedFilters.is_shareable; // Remove filter if no value selected (empty string)
+      delete updatedFilters.is_shareable;
     }
 
     onApplyFilters(updatedFilters);
   };
 
-  // Clear all filters
   const handleClearFilters = () => {
     setFilters({
       cats: "",
@@ -41,6 +68,9 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
       is_shareable: "",
       status: "",
       alphabet: "",
+      rate_type: "",
+      amount_type: "",
+      cashback_amount: ""
     });
     onClearFilters();
   };
@@ -51,7 +81,7 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
     <div className="bg-white shadow-lg p-4 rounded-lg mb-6">
       <h2 className="text-xl font-semibold mb-4">Filter Stores</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
-        {/* Category Filter */}
+        {/* Existing Category Filter */}
         <div>
           <label htmlFor="cats" className="block text-sm font-medium mb-1">
             Category
@@ -68,33 +98,86 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
           />
         </div>
 
-        {/* Cashback Filter */}
-        <div>
-          <label
-            htmlFor="cashback_enabled"
-            className="block text-sm font-medium mb-1"
-          >
-            Cashback Enabled
-          </label>
-          <select
-            id="cashback_enabled"
-            name="cashback_enabled"
-            value={filters.cashback_enabled}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          >
-            <option value="">All</option>
-            <option value="1">Yes</option>
-            <option value="0">No</option>
-          </select>
+        {/* Enhanced Cashback Section */}
+        <div className="space-y-2">
+          <div>
+            <label htmlFor="cashback_enabled" className="block text-sm font-medium mb-1">
+              Cashback Enabled
+            </label>
+            <select
+              id="cashback_enabled"
+              name="cashback_enabled"
+              value={filters.cashback_enabled}
+              onChange={handleChange}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="">All</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
+          </div>
+          
+          {filters.cashback_enabled === "1" && (
+            <>
+              <div>
+                <label htmlFor="rate_type" className="block text-sm font-medium mb-1">
+                  Rate Type
+                </label>
+                <select
+                  id="rate_type"
+                  name="rate_type"
+                  value={filters.rate_type}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="flat">Flat</option>
+                  <option value="upto">Up to</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="amount_type" className="block text-sm font-medium mb-1">
+                  Amount Type
+                </label>
+                <select
+                  id="amount_type"
+                  name="amount_type"
+                  value={filters.amount_type}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="percent">Percentage</option>
+                  <option value="fixed">Fixed Amount</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="cashback_amount" className="block text-sm font-medium mb-1">
+                  Cashback Amount
+                </label>
+                <input
+                  type="number"
+                  id="cashback_amount"
+                  name="cashback_amount"
+                  value={filters.cashback_amount}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2"
+                  step="0.5"
+                  min="0"
+                />
+              </div>
+
+              <div className="bg-gray-50 p-2 rounded">
+                <label className="block text-sm font-medium mb-1">Preview:</label>
+                <CashbackDisplay {...filters} />
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Promotion Filter */}
+        {/* Rest of your existing filters */}
         <div>
-          <label
-            htmlFor="is_promoted"
-            className="block text-sm font-medium mb-1"
-          >
+          <label htmlFor="is_promoted" className="block text-sm font-medium mb-1">
             Promoted
           </label>
           <select
@@ -110,12 +193,8 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
           </select>
         </div>
 
-        {/* Sharable Filter */}
         <div>
-          <label
-            htmlFor="is_shareable"
-            className="block text-sm font-medium mb-1"
-          >
+          <label htmlFor="is_shareable" className="block text-sm font-medium mb-1">
             Sharable
           </label>
           <select
@@ -131,7 +210,6 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
           </select>
         </div>
 
-        {/* Status Filter */}
         <div>
           <label htmlFor="status" className="block text-sm font-medium mb-1">
             Status
@@ -150,7 +228,6 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
           </select>
         </div>
 
-        {/* Alphabet Filter */}
         <div className="col-span-2">
           <label htmlFor="alphabet" className="block text-sm font-medium mb-1">
             Filter by Alphabet
@@ -180,8 +257,6 @@ const StoreFilters = ({ onApplyFilters, onClearFilters }) => {
         >
           Apply Filters
         </button>
-
-        {/* Clear Filters Button */}
         <button
           onClick={handleClearFilters}
           className="bg-red-600 text-white px-4 py-2 rounded shadow"

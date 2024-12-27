@@ -1,6 +1,6 @@
 import React, { button,useState, useEffect } from "react";
 import axios from "axios";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import StoreFilters from "./StoreFilters";
 import StoreSort from "./StoreSort";
 import SearchIcon from "@mui/icons-material/Search";
@@ -210,25 +210,27 @@ const AllStores = ({ className }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStores.map((store) => (
-            <div
-              key={store.id}
+              <Link
+              to="/store" // Navigates to the "/store" route
               className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center hover:shadow-lg transition-shadow duration-200 ease-in-out relative"
             >
-
-              
-            {/* Add Heart icon for favoriting */}
-            <button
-              onClick={() => toggleFavorite(store.id)}
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <Heart
-                className={`w-6 h-6 transition-colors ${
-                  favoriteStores.has(store.id)
-                    ? 'text-red-500 fill-red-500'
-                    : 'text-gray-400'
-                }`}
-              />
-            </button>
+            
+              {/* Add Heart icon for favoriting */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent the click event from propagating to the parent link
+                  toggleFavorite(store.id);
+                }}
+                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <Heart
+                  className={`w-6 h-6 transition-colors ${
+                    favoriteStores.has(store.id)
+                      ? 'text-red-500 fill-red-500'
+                      : 'text-gray-400'
+                  }`}
+                />
+                 </button>
 
               <img
                 src={store.logo}
@@ -250,7 +252,7 @@ const AllStores = ({ className }) => {
                   </span>
                 )}
               </p>
-            </div>
+              </Link>
           ))}
         </div>
 
